@@ -16,23 +16,17 @@ namespace Clock
         public GameObject clock;
         public TextMeshPro clocktime;
         public TextMeshPro clocktimepm;
+        public bool Enabled = true;
 
-        void Start()
-        {
-            Utilla.Events.GameInitialized += OnGameInitialized;
-        }
+        void Start() => Utilla.Events.GameInitialized += OnGameInitialized;
 
-        void OnEnable()
-        {
-            HarmonyPatches.ApplyHarmonyPatches();
-        }
+        void OnEnable() { Enabled = true; HarmonyPatches.ApplyHarmonyPatches(); clock.SetActive(true); }
 
-        void OnDisable()
-        {
-            HarmonyPatches.RemoveHarmonyPatches();
-        }
+        void OnDisable() { Enabled = false; HarmonyPatches.RemoveHarmonyPatches(); clock.SetActive(false); }
 
-        void OnGameInitialized(object sender, EventArgs e)
+        void OnGameInitialized(object sender, EventArgs e) => Setup();
+
+        public void Setup()
         {
             assetbundle = LoadAssetBundle("Clock.Resources.clock");
 
@@ -71,18 +65,21 @@ namespace Clock
             }
         }
 
-        void Update()
+        public void Update()
         {
-            DateTime currentTime = DateTime.Now;
-
-            if (clocktime != null && clocktimepm != null)
+            if (Enabled)
             {
-                clocktime.text = currentTime.ToString("hh:mm");
-                clocktimepm.text = currentTime.ToString("tt");
+                DateTime currentTime = DateTime.Now;
+
+                if (clocktime != null && clocktimepm != null)
+                {
+                    clocktime.text = currentTime.ToString("hh:mm");
+                    clocktimepm.text = currentTime.ToString("tt");
+                }
             }
         }
 
-        AssetBundle LoadAssetBundle(string path)
+        public AssetBundle LoadAssetBundle(string path)
         {
             Stream stream = Assembly.GetExecutingAssembly().GetManifestResourceStream(path);
 
