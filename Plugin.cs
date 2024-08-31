@@ -6,6 +6,8 @@ using UnityEngine;
 using Utilla;
 using TMPro;
 
+/* Clock Mod */
+
 namespace Clock
 {
     [BepInDependency("org.legoandmars.gorillatag.utilla", "1.5.0")]
