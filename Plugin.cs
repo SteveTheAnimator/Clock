@@ -19,12 +19,23 @@ namespace Clock
         public TextMeshPro clocktime;
         public TextMeshPro clocktimepm;
         public bool Enabled = true;
+        private DateTime lastTimeDisplayed;
 
         void Start() => Utilla.Events.GameInitialized += OnGameInitialized;
 
-        void OnEnable() { Enabled = true; HarmonyPatches.ApplyHarmonyPatches(); clock.SetActive(true); }
+        void OnEnable()
+        {
+            Enabled = true;
+            HarmonyPatches.ApplyHarmonyPatches();
+            clock.SetActive(true);
+        }
 
-        void OnDisable() { Enabled = false; HarmonyPatches.RemoveHarmonyPatches(); clock.SetActive(false); }
+        void OnDisable()
+        {
+            Enabled = false;
+            HarmonyPatches.RemoveHarmonyPatches();
+            clock.SetActive(false);
+        }
 
         void OnGameInitialized(object sender, EventArgs e) => Setup();
 
@@ -60,6 +71,8 @@ namespace Clock
                 {
                     Debug.LogError("Failed to find TextMeshPro components on the clock object.");
                 }
+
+                lastTimeDisplayed = DateTime.MinValue;
             }
             else
             {
@@ -73,10 +86,15 @@ namespace Clock
             {
                 DateTime currentTime = DateTime.Now;
 
-                if (clocktime != null && clocktimepm != null)
+                if (currentTime.Minute != lastTimeDisplayed.Minute)
                 {
-                    clocktime.text = currentTime.ToString("hh:mm");
-                    clocktimepm.text = currentTime.ToString("tt");
+                    if (clocktime != null && clocktimepm != null)
+                    {
+                        clocktime.text = currentTime.ToString("hh:mm");
+                        clocktimepm.text = currentTime.ToString("tt");
+
+                        lastTimeDisplayed = currentTime;
+                    }
                 }
             }
         }
